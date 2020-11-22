@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Litepie\Http\Request as LitepieRequest;
 
-abstract class Request extends FormRequest
+abstract class Request extends LitepieRequest
 {
-    //
+
 }

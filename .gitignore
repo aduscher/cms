@@ -1,8 +1,20 @@
+.env
+*.zip
+._*
 /vendor
 /node_modules
+/public/themes
+/packages
+Homestead.json
+Homestead.yaml
 composer.lock
-.DS_Store
-._**
-*.tmp
-*.zip
-.env
+package-lock.json
+
+# VScode
+~/
+ 
+# PhpStorm 
+.idea/
+*.iml
+# File-based project format:
+*.iws 

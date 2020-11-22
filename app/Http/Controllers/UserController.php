@@ -2,84 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use Redirect;
-use Request;
-use App;
+use App\Http\Controllers\Controller as BaseController;
+use Litepie\Theme\ThemeAndViews;
+use Litepie\User\Traits\RoutesAndGuards;
+use Litepie\User\Traits\UserPages;
+use App\Http\Response\ResourceResponse;
 
-class UserController extends Controller
+
+class UserController extends BaseController
 {
+    use RoutesAndGuards, ThemeAndViews, UserPages;
 
+    /**
+     * Initialize public controller.
+     *
+     * @return null
+     */
     public function __construct()
     {
-        $request = App::make(\Illuminate\Http\Request::class);
-        $role = $request->route('role');
-        $this->middleware('auth.role:'.$role);
-        $this->setupTheme(config('cms.themes.user.theme'), config('cms.themes.user.layout'));
+        guard(request()->guard . '.web');
+        $this->middleware('auth:' . guard());
+        $this->response = app(ResourceResponse::class);
+        $this->setTheme();
     }
 
     /**
-     * Display dashboard.
+     * Show dashboard for each user.
      *
-     * @return response
+     * @return \Illuminate\Http\Response
      */
     public function home()
     {
-        return $this->theme->of('public::user.dashboard')->render();
+        return $this->response
+            ->layout('user')
+            ->title('Dashboard')
+            ->view('home')
+            ->output();
     }
 
-    /**
-     * Return success message.
-     *
-     * @param int $id
-     *
-     * @return Response
-     */
-    public function error($message, $status = 400)
-    {
-        if (Request::ajax()) {
-            return json_encode(['redirect' => $this->getRedirectPath(), 'status' => 'error']);
-        }
-
-        return Redirect::to($this->getRedirectPath())->withInput()->with('error', $message);
-    }
-
-    /**
-     * Return error message.
-     *
-     * @param int $id
-     *
-     * @return Response
-     */
-    public function success($message, $status = 201)
-    {
-        if (Request::ajax()) {
-            return json_encode(['redirect' => $this->getRedirectPath(), 'status' => 'success']);
-        }
-
-        return Redirect::to($this->getRedirectPath())->withInput()->with('success', $message);
-    }
-
-    /**
-     * Return the redirect path.
-     *
-     * @param int $id
-     *
-     * @return Response
-     */
-    public function getRedirectPath()
-    {
-        return $this->redirectPath;
-    }
-
-    /**
-     * Return the redirect path.
-     *
-     * @param int $id
-     *
-     * @return Response
-     */
-    public function setRedirectPath($path)
-    {
-        $this->redirectPath = $path;
-    }
 }

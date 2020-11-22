@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Page;
+use App\Http\Response\PublicResponse;
+use Litepie\Theme\ThemeAndViews;
+use Litepie\User\Traits\RoutesAndGuards;
 
-/**
- *
- */
 class PublicController extends Controller
 {
+    use ThemeAndViews, RoutesAndGuards;
+
     /**
      * Initialize public controller.
      *
@@ -16,23 +17,26 @@ class PublicController extends Controller
      */
     public function __construct()
     {
-        $this->setupTheme(config('cms.themes.public.theme'), config('cms.themes.public.layout'));
+        $this->response = app(PublicResponse::class);
+        $this->setTheme('public');
     }
 
     /**
-     * Display homepage.
+     * Show dashboard for each user.
      *
-     * @return response
+     * @return \Illuminate\Http\Response
      */
     public function home()
     {
-        $data['page'] = Page::getPageBySlug('home');
-        $this->theme->setTitle($data['page']->title);
-        $this->theme->setKeywords($data['page']->keyword);
-        $this->theme->setDescription($data['page']->description);
+        $page = app(\Litecms\Page\Interfaces\PageRepositoryInterface::class)->getPage('home');
 
-        $this->theme->layout('home');
-
-        return $this->theme->of('public.home', $data)->render();
+        return $this->response
+            ->setMetaKeyword(strip_tags($page->meta_keyword))
+            ->setMetaDescription(strip_tags($page->meta_description))
+            ->setMetaTitle(strip_tags($page->meta_title))
+            ->layout('home')
+            ->view('home')
+            ->data(compact('page'))
+            ->output();
     }
 }

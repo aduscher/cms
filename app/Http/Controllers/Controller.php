@@ -6,26 +6,27 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use Teepluss\Theme\Facades\Theme;
 
-abstract class Controller extends BaseController
+class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
-     * Theme instance.
-     *
-     * @var \Teepluss\Theme\Theme
+     * @var store response object
      */
-    protected $theme;
+    public $response;
 
     /**
-     * Model instance.
+     * @var store repository object
      */
-    protected $model;
+    public $repository;
 
-    public function setupTheme($theme = 'default', $layout = 'default')
+
+    public function callAction($method, $parameters)
     {
-        $this->theme = Theme::uses($theme)->layout($layout);
+        unset($parameters['guard']);
+        unset($parameters['trans']);
+
+        return parent::callAction($method, $parameters);
     }
 }
